@@ -1,28 +1,31 @@
 def max_min_distance_after_placement(n, seats):
-    # 현재 사람들의 위치 파악
     current_positions = [i for i, seat in enumerate(seats) if seat == '1']
     
-    # 비어있는 자리 파악
-    empty_positions = [i for i, seat in enumerate(seats) if seat == '0']
+    if len(current_positions) == 0:
+        return (n - 1) // 2
     
-    max_min_distance = 0
+    # 모든 빈 자리(0)를 포함하는 연속된 구간을 찾기
+    max_distance = 0
+    max_distances = []
+    prev_position = -1
     
-    # 모든 빈 자리 중 두 자리를 선택하는 조합
-    for i in range(len(empty_positions)):
-        for j in range(i + 1, len(empty_positions)):
-            new_positions = current_positions + [empty_positions[i], empty_positions[j]]
-            new_positions.sort()
-            
-            # 가장 가까운 두 사람 간의 거리 계산
-            min_distance = float('inf')
-            for k in range(1, len(new_positions)):
-                distance = new_positions[k] - new_positions[k - 1]
-                min_distance = min(min_distance, distance)
-            
-            # 가능한 가장 가까운 두 사람 간의 거리의 최대값 갱신
-            max_min_distance = max(max_min_distance, min_distance)
+    for i in range(n):
+        if seats[i] == '1':
+            if prev_position == -1:
+                max_distances.append(i)
+            else:
+                max_distances.append((i - prev_position) // 2)
+            prev_position = i
+
+    max_distances.append(n - 1 - current_positions[-1])
     
-    return max_min_distance
+    max_distances.sort()
+    
+    # 가장 큰 두 개의 간격에서 두 명을 배치하는 경우가 최적
+    if len(max_distances) == 1:
+        return max_distances[0]
+    else:
+        return max(max_distances[-1], max_distances[-2])
 
 # 입력 처리
 n = int(input())
